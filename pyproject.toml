@@ -2,7 +2,7 @@
 name = "devcontainer-apoenastack"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Pitta <arthurpitta21@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
