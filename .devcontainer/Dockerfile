@@ -3,7 +3,7 @@ FROM python:3.12-slim-bookworm AS base
 
 WORKDIR /app/
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
+ENV PYTHONPATH "${PYTHONPATH}:/app/"
 
 # Build the development image
 FROM base AS dev

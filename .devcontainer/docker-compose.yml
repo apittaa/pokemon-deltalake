@@ -1,0 +1,62 @@
+services:
+  app:
+    # Builds the `app` service using the specified Dockerfile located at `.devcontainer/Dockerfile`
+    build: 
+      context: ../  # The build context is the parent directory
+      dockerfile: .devcontainer/Dockerfile  # Path to the Dockerfile
+      target: dev # The target stage in the Dockerfile to build
+    platform: linux/amd64  # Specifies the platform for the app service
+    container_name: devcontainer-apoenastack  # The container will be named 'devcontainer-apoenastack'
+    
+    # Mounts the project directory into the container for live code syncing
+    volumes:
+      - ..:/workspace:cached  # Mount the parent directory to `/workspace` in the container
+
+    # Keeps the container running by executing a long-running dummy command
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  s3service:
+    # Pulls the Minio image to create an object storage service
+    image: quay.io/minio/minio  # The image used to run Minio
+    container_name: minio  # The container will be named 'minio'
+
+    # Maps the container's ports to the host machine, enabling access to Minio's services
+    ports:
+      - '9000:9000'  # Maps port 9000 for the Minio service
+      - '9001:9001'  # Maps port 9001 for Minio's console
+    
+    # Loads environment variables from an external file
+    env_file: ./minio.env  # Loads environment variables from a file
+    
+    # Mounts a volume to persist Minio data
+    volumes:
+      - minio-data:/workspace/data/minio  # Mounts a persistent volume to store Minio data
+    
+    # Configures the entrypoint script to start Minio with the specified environment variables
+    command: server data --console-address ":9001"
+
+  initialize-s3service:
+    # Uses Minio's client (`mc`) to initialize buckets and users in the Minio service
+    image: quay.io/minio/mc  # The image used to run Minio Client (mc)
+    container_name: miniomc  # The container will be named 'miniomc'
+    
+    # Specifies that this service depends on the Minio service, ensuring Minio starts first
+    depends_on:
+      - s3service  # Wait for the s3service (Minio) to be available before running
+    
+    # The entrypoint script that sets up Minio with buckets and user accounts
+    entrypoint: >
+      /bin/sh -c '
+      /usr/bin/mc alias set s3service http://s3service:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}";
+      /usr/bin/mc mb s3service/"$${BUCKET}";
+      /usr/bin/mc admin user add s3service "$${ACCESS_KEY}" "$${SECRET_KEY}";
+      /usr/bin/mc admin policy attach s3service readwrite --user "$${ACCESS_KEY}";
+      exit 0;
+      '
+    
+    # Loads environment variables from an external file
+    env_file: ./minio.env  # Loads environment variables from a file
+
+# Declare the named volumes used by the services
+volumes:
+  minio-data: {}  # Persistent storage for Minio data, managed by Docker

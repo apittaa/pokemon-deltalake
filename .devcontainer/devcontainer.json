@@ -1,34 +1,32 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+
 {
+	// Dev Container name
 	// Change 'devcontainer-apoenastack' to the name of your project.
 	"name": "devcontainer-apoenastack",
-	"build": {
-		// Sets the run context to one level up instead of the .devcontainer folder.
-		"context": "../",
-		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-		"dockerfile": "dockerfile",
-		
-		// Set targets to the desired Docker build stages if applicable
-		"target": "dev",
-		"args": {
-			// Options arm64 or amd64
-			"PLATFORM": "amd64" 
-		}
-	},
 	
-	// Set runArgs to configure ssh key
-    // Change the path to the location of your ssh key and bash history.
-	"runArgs": [
-		"--init",
-		"-v", "/home/apitta/.ssh/:/root/.ssh/",
-		"-v", "/home/apitta/.bash_history:/root/.bash_history",
-		"-e", "SSH_AUTH_SOCK="
-	],
+	// The name of the docker-compose file use 
+	// to start the services
+	"dockerComposeFile": "./docker-compose.yml",
+	
+	// The service you want to work on. This is 
+	// considered the primary container for your
+	// dev environment which your editor will 
+	// connect to.
+	"service": "app",
+
+	// The path of the workspace folder inside 
+	// the container. This is typically the target
+	// path of a volume mount in the docker-compose.yml.
+	"workspaceFolder": "/workspace",
 
 	// Mount the Docker socket so the container has access to the Docker host. More info: https://aka.ms/vscode-remote/containers/mounts
+	// Mount the SSH keys and bash history to the container.
     "mounts": [
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+		"source=/home/apitta/.ssh,target=/root/.ssh,type=bind",
+		"source=/home/apitta/.bash_history,target=/root/.bash_history,type=bind"
     ],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -43,7 +41,7 @@
 	
 	// Add postAttachCommand to add the safe.directory to the git config. More info: https://aka.ms/vscode-remote/containers/advanced-configuration.
 	// Change the safe.directory to the path of your workspace.
-	"postAttachCommand": "git config --global --add safe.directory /workspaces/devcontainer-apoenastack",
+	"postAttachCommand": "git config --global --add safe.directory /workspace",
 	
 	// Configure tool-specific properties.
 	"customizations": {
@@ -62,8 +60,8 @@
 				"GitHub.github-vscode-theme"
 			]
 		}
-	}
+	},
 
 	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "devcontainer"
+	"remoteUser": "root"
 }
