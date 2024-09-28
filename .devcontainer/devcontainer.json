@@ -1,0 +1,68 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+	// Change 'devcontainer-apoenastack' to the name of your project.
+	"name": "devcontainer-apoenastack",
+	"build": {
+		// Sets the run context to one level up instead of the .devcontainer folder.
+		"context": "../",
+		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+		"dockerfile": "dockerfile",
+		
+		// Set targets to the desired Docker build stages if applicable
+		"target": "dev",
+		"args": {
+			// Options arm64 or amd64
+			"PLATFORM": "amd64" 
+		}
+	},
+	
+	// Set runArgs to configure ssh key
+    // Change the path to the location of your ssh key.
+	"runArgs": [
+		"--init",
+		"-v", "/home/apitta/.ssh/:/root/.ssh/",
+		"-e", "SSH_AUTH_SOCK="
+	],
+
+	// Mount the Docker socket so the container has access to the Docker host. More info: https://aka.ms/vscode-remote/containers/mounts
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},	
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment the next line to run commands after the container is created.
+	// Add postCreateCommand to configure zsh, install pre-commit hooks and initialize poetry.
+	"postCreateCommand": "poetry config --local virtualenvs.path .venv && test -f pyproject.toml || poetry init --no-interaction && poetry install --no-root",
+	
+	// Add postAttachCommand to add the safe.directory to the git config. More info: https://aka.ms/vscode-remote/containers/advanced-configuration.
+	// Change the safe.directory to the path of your workspace.
+	"postAttachCommand": "git config --global --add safe.directory /workspaces/devcontainer-apoenastack",
+	
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": { 
+			// Add settings to configure git path
+			"settings": { 
+				"git.path": "/usr/bin/git",
+				"terminal.integrated.shell.linux": "/bin/bash"
+			},
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"github.copilot",
+				"github.copilot-chat",
+				"github.vscode-github-actions",
+				"GitHub.github-vscode-theme"
+			]
+		}
+	}
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}
