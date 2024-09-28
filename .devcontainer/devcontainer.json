@@ -18,7 +18,7 @@
 	},
 	
 	// Set runArgs to configure ssh key
-    // Change the path to the location of your ssh key.
+    // Change the path to the location of your ssh key and bash history.
 	"runArgs": [
 		"--init",
 		"-v", "/home/apitta/.ssh/:/root/.ssh/",
