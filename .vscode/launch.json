@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "devcontainer_apoenastack_main",  // Name of the configuration
+            "name": "raw_pokemons",  // Name of the configuration
             "type": "debugpy",  // Type of debugger
             "request": "launch",  // Request type
             "console": "integratedTerminal",  // Use the integrated terminal for output
