@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "raw_pokemon",  // Name of the configuration
+            "type": "debugpy",  // Type of debugger
+            "request": "launch",  // Request type
+            "console": "integratedTerminal",  // Use the integrated terminal for output
+            "program": "${workspaceFolder}/src/pipeline/raw_pokemon.py",  // Path to the program to debug
+            "justMyCode": true,  // Debug only user-written code
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/.venv/lib/python3.12/site-packages"  // Add the workspace folder to the PYTHONPATH
+            }
+        },
+        {
+            "name": "bronze_pokemon",  // Name of the configuration
+            "type": "debugpy",  // Type of debugger
+            "request": "launch",  // Request type
+            "console": "integratedTerminal",  // Use the integrated terminal for output
+            "program": "${workspaceFolder}/src/pipeline/bronze_pokemon.py",  // Path to the program to debug
+            "justMyCode": true,  // Debug only user-written code
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/.venv/lib/python3.12/site-packages"  // Add the workspace folder to the PYTHONPATH
+            }
+        },
+    ]
+}
