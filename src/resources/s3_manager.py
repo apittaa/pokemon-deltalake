@@ -1,7 +1,10 @@
 import boto3
 from loguru import logger
 
-def create_s3_client(access_key: str, secret_key: str, endpoint_url: str) -> boto3.client:
+
+def create_s3_client(
+    access_key: str, secret_key: str, endpoint_url: str
+) -> boto3.client:
     """
     Creates an S3 client using the provided AWS access key, secret key, and endpoint URL.
     Args:

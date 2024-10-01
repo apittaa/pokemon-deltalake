@@ -3,7 +3,6 @@ from loguru import logger
 from dotenv import load_dotenv
 import os
 import boto3
-from urllib.parse import urlparse
 
 import sys
 
@@ -16,26 +15,26 @@ from resources.s3_manager import create_s3_client
 def get_latest_file_from_s3(bucket: str, folder: str, s3_conn: boto3.client) -> str:
     """
     Get the latest file from an S3 bucket folder.
-    
+
     This function retrieves the latest file from a specified folder in an S3 bucket.
     It lists all the files in the folder, sorts them by their names in descending order,
     and returns the name of the latest file.
-    
+
     Args:
         bucket (str): The name of the S3 bucket.
         folder (str): The folder path within the S3 bucket.
         s3_conn (boto3.client): The S3 client connection object.
-    
+
     Returns:
         str: The name of the latest file in the specified folder.
     """
 
-    logger.info(f"Getting the latest file from the S3 bucket")
+    logger.info("Getting the latest file from the S3 bucket")
     response = s3_conn.list_objects_v2(Bucket=bucket, Prefix=folder)
 
     # Extract the filenames
-    files = [content['Key'] for content in response.get('Contents', [])]
-    
+    files = [content["Key"] for content in response.get("Contents", [])]
+
     # Sort the files by their name (assuming they are timestamped)
     files.sort(reverse=True)
 
@@ -48,7 +47,15 @@ def get_latest_file_from_s3(bucket: str, folder: str, s3_conn: boto3.client) -> 
     else:
         logger.error("No files found in the specified folder.")
 
-def get_and_save_data(conn: duckdb.DuckDBPyConnection, raw_bucket: str, bronze_bucket: str, raw_folder: str, bronze_folder: str, latest_raw_file: str) -> None:
+
+def get_and_save_data(
+    conn: duckdb.DuckDBPyConnection,
+    raw_bucket: str,
+    bronze_bucket: str,
+    raw_folder: str,
+    bronze_folder: str,
+    latest_raw_file: str,
+) -> None:
     """
     Save data from a JSON file in an S3 bucket to a Parquet file in the same bucket.
     This function reads data from a JSON file stored in an S3 bucket using DuckDB,
@@ -66,10 +73,9 @@ def get_and_save_data(conn: duckdb.DuckDBPyConnection, raw_bucket: str, bronze_b
 
     logger.info("Saving data to S3 bucket in Parquet format")
     latest_raw_file_path = f"s3a://{raw_bucket}/{raw_folder}/{latest_raw_file}"
-    
+
     latest_bronze_file_path = f"s3a://{bronze_bucket}/{bronze_folder}/{latest_raw_file}"
-    
-    
+
     # Query to read the latest file
     query = f"""
         COPY (
@@ -85,11 +91,10 @@ def get_and_save_data(conn: duckdb.DuckDBPyConnection, raw_bucket: str, bronze_b
         logger.success("Data saved to S3 bucket in Parquet format")
     except Exception as e:
         logger.error(f"Error executing query: {e}")
-    
 
 
 if __name__ == "__main__":
-    # Load environment variables    
+    # Load environment variables
     load_dotenv()
 
     # Get the S3 credentials and bucket names
@@ -101,7 +106,7 @@ if __name__ == "__main__":
 
     # Define the S3 endpoint URL
     s3_endpoint_url = "http://s3service:9000"
-    
+
     # Folder where the raw data is stored
     raw_folder = "pokemons_raw/pokemons_list"
     bronze_folder = "pokemons_bronze/pokemons_list"
@@ -116,4 +121,11 @@ if __name__ == "__main__":
     duckdb_conn = create_duckdb_connection(access_key, secret_key, aws_region)
 
     # Save the data to the Bronze bucket
-    get_and_save_data(duckdb_conn, raw_bucket, bronze_bucket, raw_folder, bronze_folder, latest_raw_file)
+    get_and_save_data(
+        duckdb_conn,
+        raw_bucket,
+        bronze_bucket,
+        raw_folder,
+        bronze_folder,
+        latest_raw_file,
+    )
