@@ -70,7 +70,7 @@ if __name__ == "__main__":
     bucket = os.getenv("RAW_BUCKET")
 
     # Define the S3 endpoint URL
-    s3_endpoint_url = "http://s3service:9000"
+    s3_endpoint_url = "http://localhost:9000"
 
     # Define the base URL and query parameters
     base_url = "https://pokeapi.co/api/v2/pokemon/"

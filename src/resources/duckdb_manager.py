@@ -32,7 +32,7 @@ def create_duckdb_connection(
         conn.execute("LOAD httpfs;")
         logger.info("Setting S3 configuration parameters")
         conn.execute("SET s3_url_style='path';")
-        conn.execute("SET s3_endpoint='s3service:9000';")
+        conn.execute("SET s3_endpoint='localhost:9000';")
         conn.execute("SET s3_use_ssl = false;")
         conn.execute(f"SET s3_region='{aws_region}'")
         conn.execute(f"SET s3_access_key_id='{aws_access_key}';")

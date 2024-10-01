@@ -72,9 +72,9 @@ def get_and_save_data(
     latest_raw_file = os.path.splitext(latest_raw_file)[0]
 
     logger.info("Saving data to S3 bucket in Parquet format")
-    latest_raw_file_path = f"s3a://{raw_bucket}/{raw_folder}/{latest_raw_file}"
+    latest_raw_file_path = f"s3://{raw_bucket}/{raw_folder}/{latest_raw_file}"
 
-    latest_bronze_file_path = f"s3a://{bronze_bucket}/{bronze_folder}/{latest_raw_file}"
+    latest_bronze_file_path = f"s3://{bronze_bucket}/{bronze_folder}/{latest_raw_file}"
 
     # Query to read the latest file
     query = f"""
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     bronze_bucket = os.getenv("BRONZE_BUCKET")
 
     # Define the S3 endpoint URL
-    s3_endpoint_url = "http://s3service:9000"
+    s3_endpoint_url = "http://localhost:9000"
 
     # Folder where the raw data is stored
     raw_folder = "pokemons_raw/pokemons_list"
