@@ -26,7 +26,7 @@ services:
       - '9001:9001'  # Maps port 9001 for Minio's console
     
     # Loads environment variables from an external file
-    env_file: ./minio.env  # Loads environment variables from a file
+    env_file: ../.env  # Loads environment variables from a file
     
     # Mounts a volume to persist Minio data
     volumes:
@@ -48,14 +48,15 @@ services:
     entrypoint: >
       /bin/sh -c '
       /usr/bin/mc alias set s3service http://s3service:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}";
-      /usr/bin/mc mb s3service/"$${BUCKET}";
+      /usr/bin/mc mb s3service/"$${RAW_BUCKET}";
+      /usr/bin/mc mb s3service/"$${BRONZE_BUCKET}";
       /usr/bin/mc admin user add s3service "$${ACCESS_KEY}" "$${SECRET_KEY}";
       /usr/bin/mc admin policy attach s3service readwrite --user "$${ACCESS_KEY}";
       exit 0;
       '
     
     # Loads environment variables from an external file
-    env_file: ./minio.env  # Loads environment variables from a file
+    env_file: ../.env  # Loads environment variables from a file
 
 # Declare the named volumes used by the services
 volumes:
