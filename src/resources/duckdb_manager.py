@@ -24,6 +24,7 @@ def create_duckdb_connection(
         Exception: If there is an error connecting to DuckDB or setting the S3 configuration parameters.
     """
 
+    # Connect to DuckDB and configure it to use AWS S3 credentials
     try:
         logger.info("Connecting to DuckDB")
         conn = duckdb.connect()
@@ -62,6 +63,8 @@ def execute_query(conn: duckdb.DuckDBPyConnection, query: str) -> None:
     Raises:
         Exception: If there is an error during query execution, it is caught and logged.
     """
+    
+    # Execute the query
     try:
         logger.info("Executing query")
         conn.execute(query)
