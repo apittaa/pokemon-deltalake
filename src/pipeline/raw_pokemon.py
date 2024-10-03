@@ -14,6 +14,15 @@ from resources.s3_manager import create_s3_client
 
 
 def get_data(base_url: str, params: dict) -> dict:
+    """
+    Fetches Pokémon data from the given API endpoint, handling pagination and displaying progress.
+    Args:
+        base_url (str): The base URL of the Pokémon API endpoint.
+        params (dict): A dictionary of query parameters to include in the API request.
+    Returns:
+        dict: A dictionary containing all Pokémon data fetched from the API.
+    """
+    
     # Make an initial request to get the total number of Pokemon
     response = requests.get(base_url, params=params)
     data = response.json()
@@ -43,12 +52,26 @@ def get_data(base_url: str, params: dict) -> dict:
 
 
 def save_data(data: dict, s3_client: boto3.client, bucket: str) -> None:
+    """
+    Save the given data to an S3 bucket.
+    Args:
+        data (dict): The data to be saved.
+        s3_client (boto3.client): The Boto3 S3 client used to interact with S3.
+        bucket (str): The name of the S3 bucket where the data will be saved.
+    Returns:
+        None
+    Raises:
+        Exception: If there is an error saving the data to the S3 bucket.
+    """
+    
     try:
         logger.info("Saving data to S3 bucket")
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+        # Convert the data to JSON and encode it as bytes
         json_bytes = json.dumps(data).encode("utf-8")
 
+        # Save the data to the S3 bucket
         s3_client.put_object(
             Bucket=bucket,
             Key=f"pokemons_raw/pokemons_list/{now}.json",

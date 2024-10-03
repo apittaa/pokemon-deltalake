@@ -15,14 +15,16 @@ def create_s3_client(
         boto3.client: A Boto3 S3 client object.
     """
 
-    logger.info("Creating S3 client")
     # Create and return your S3 client here using access_key and secret_key
-    s3_client = boto3.client(
-        "s3",
-        endpoint_url=endpoint_url,
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
-    )
-
-    logger.success("S3 client created")
-    return s3_client
+    try:
+        logger.info("Creating S3 client")
+        s3_client = boto3.client(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+        )
+        logger.success("S3 client created")
+        return s3_client
+    except Exception as e:
+        logger.error(f"Failed to create S3 client: {e}")
