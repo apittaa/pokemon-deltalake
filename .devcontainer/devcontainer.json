@@ -3,8 +3,8 @@
 
 {
 	// Dev Container name
-	// Change 'devcontainer-apoenastack' to the name of your project.
-	"name": "devcontainer-apoenastack",
+	// Change 'pokemon-deltalake' to the name of your project.
+	"name": "pokemon-deltalake",
 	
 	// The name of the docker-compose file use 
 	// to start the services
@@ -25,8 +25,10 @@
 	// Mount the SSH keys and bash history to the container.
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-		"source=/home/apitta/.ssh,target=/root/.ssh,type=bind",
-		"source=/home/apitta/.bash_history,target=/root/.bash_history,type=bind"
+		"source=/home/$USER/.ssh,target=/root/.ssh,type=bind",
+		"source=/home/$USER/.bash_history,target=/root/.bash_history,type=bind",
+		"source=/home/apitta/.gitconfig-work,target=/root/.gitconfig-work,type=bind",
+		"source=/home/apitta/.gitconfig-personal,target=/root/.gitconfig-personal,type=bind"
     ],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
