@@ -27,6 +27,7 @@
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
 		"source=/home/$USER/.ssh,target=/root/.ssh,type=bind",
 		"source=/home/$USER/.bash_history,target=/root/.bash_history,type=bind",
+		"source=/home/$USER/.zsh_history,target=/root/.zsh_history,type=bind",
 		"source=/home/$USER/.gitconfig-personal,target=/root/.gitconfig-personal,type=bind"  // Add the path to your gitconfig file if you have one different from the default
     ],
 
