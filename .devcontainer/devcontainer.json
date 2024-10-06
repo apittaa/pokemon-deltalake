@@ -37,11 +37,11 @@
 
 	// Uncomment the next line to run commands after the container is created.
 	// Add postCreateCommand to configure zsh, install pre-commit hooks and initialize poetry.
-	"postCreateCommand": "poetry config --local virtualenvs.path .venv && test -f pyproject.toml || poetry init --no-interaction && poetry install --no-root",
+	"postCreateCommand": "chmod +x .devcontainer/zsh.sh && .devcontainer/zsh.sh && poetry config --local virtualenvs.path .venv && test -f pyproject.toml || poetry init --no-interaction && poetry install --no-root",
 	
 	// Add postAttachCommand to add the safe.directory to the git config. More info: https://aka.ms/vscode-remote/containers/advanced-configuration.
 	// Change the safe.directory to the path of your workspace.
-	"postAttachCommand": "git config --global --add safe.directory /workspace",
+	"postAttachCommand": "git config --global --add safe.directory /workspace && pre-commit install",
 	
 	// Configure tool-specific properties.
 	"customizations": {
