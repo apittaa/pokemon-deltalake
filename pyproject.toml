@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "devcontainer-apoenastack"
+version = "0.1.0"
+description = ""
+authors = ["Pitta <arthurpitta21@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+loguru = "^0.7.2"
+requests = "^2.32.3"
+boto3 = "^1.35.29"
+python-dotenv = "^1.0.1"
+duckdb = "1.1.1"
+tqdm = "^4.66.5"
+ruff = "^0.6.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
