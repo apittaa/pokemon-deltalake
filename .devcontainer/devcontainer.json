@@ -42,7 +42,7 @@
 	
 	// Add postAttachCommand to add the safe.directory to the git config. More info: https://aka.ms/vscode-remote/containers/advanced-configuration.
 	// Change the safe.directory to the path of your workspace.
-	"postAttachCommand": "git config --global --add safe.directory /workspace && pre-commit install",
+	"postAttachCommand": "git config --global --add safe.directory /workspace && git config --file /root/.gitconfig-personal --get user.name && git config --file /root/.gitconfig-personal --get user.email && pre-commit install",
 	
 	// Configure tool-specific properties.
 	"customizations": {
