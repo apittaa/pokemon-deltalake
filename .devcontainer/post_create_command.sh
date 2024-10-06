@@ -14,3 +14,4 @@ fi
 
 # Install dependencies
 poetry install --no-root
+

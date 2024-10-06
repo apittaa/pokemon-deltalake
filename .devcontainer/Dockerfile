@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker.io \
     curl \
     unzip \
+    openssh-client \
     && rm -rf /var/lib/apt/lists/*  # Clean up apt cache
 
 # Install DuckDB CLI
