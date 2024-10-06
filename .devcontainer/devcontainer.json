@@ -37,11 +37,11 @@
 	// "forwardPorts": [],
 
 	// Uncomment the next line to run commands after the container is created.
-	// Add postCreateCommand to configure zsh, install pre-commit hooks and initialize poetry.
+	// Post create commands are run after the container is created and before the workspace is mounted.
 	"postCreateCommand": "chmod +x .devcontainer/post_create_command.sh && .devcontainer/post_create_command.sh",
 	
 	// Add postAttachCommand to add the safe.directory to the git config. More info: https://aka.ms/vscode-remote/containers/advanced-configuration.
-	// Change the safe.directory to the path of your workspace.
+	// Post attach commands are run after the container is attached and the workspace is mounted.
 	"postAttachCommand": "chmod +x .devcontainer/post_attach_command.sh && .devcontainer/post_attach_command.sh",
 	
 	// Configure tool-specific properties.
