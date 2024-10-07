@@ -13,7 +13,17 @@ CREATE SECRET s3_secret (
 
 SELECT
     *
-FROM read_json_auto('s3://raw/pokemons_raw/pokemons_list/20241001_151305.json');
+FROM read_json_auto('s3://raw/pokemons_raw/pokemons_list/20241006_184045.json');
+
+SELECT
+    *
+FROM read_json_auto('s3://raw/pokemons_raw/pokemon_species/20241007_124140.json', maximum_object_size=300000000);
+
+SELECT
+    *
+FROM read_json_auto('s3://raw/pokemons_raw/pokemon_details/20241006_184045.json', maximum_object_size=300000000);
+
+SELECT * FROM test;
 
 SELECT
     *
