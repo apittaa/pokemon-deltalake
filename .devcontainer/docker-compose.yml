@@ -59,6 +59,8 @@ services:
       /usr/bin/mc alias set s3service http://localhost:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}";
       /usr/bin/mc mb s3service/"$${RAW_BUCKET}";
       /usr/bin/mc mb s3service/"$${BRONZE_BUCKET}";
+      /usr/bin/mc mb s3service/"$${SILVER_BUCKET}";
+      /usr/bin/mc mb s3service/"$${GOLD_BUCKET}";
       /usr/bin/mc admin user add s3service "$${ACCESS_KEY}" "$${SECRET_KEY}";
       /usr/bin/mc admin policy attach s3service readwrite --user "$${ACCESS_KEY}";
       exit 0;
