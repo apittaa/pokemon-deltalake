@@ -1,7 +1,7 @@
 import pyarrow as pa
 
-# Define the schema using PyArrow
-POKEMON_SPICIES_SCHEMA = pa.schema(
+# Define the bronze schema using PyArrow
+BRONZE_POKEMON_SPECIES_SCHEMA = pa.schema(
     [
         ("base_happiness", pa.int64()),
         ("capture_rate", pa.int64()),
@@ -132,5 +132,26 @@ POKEMON_SPICIES_SCHEMA = pa.schema(
                 )
             ),
         ),
+    ]
+)
+
+# Define the silver schema using PyArrow
+SILVER_POKEMON_SPECIES_SCHEMA = pa.schema(
+    [
+        pa.field("id", pa.int64()),  # BIGINT
+        pa.field("name", pa.string()),  # VARCHAR
+        pa.field("capture_rate", pa.int64()),  # BIGINT
+        pa.field("base_happiness", pa.int64()),  # BIGINT
+        pa.field("is_baby", pa.bool_()),  # BOOLEAN
+        pa.field("is_legendary", pa.bool_()),  # BOOLEAN
+        pa.field("is_mythical", pa.bool_()),  # BOOLEAN
+        pa.field("growth_rate", pa.string()),  # VARCHAR
+        pa.field("egg_groups", pa.string()),  # VARCHAR
+        pa.field("color", pa.string()),  # VARCHAR
+        pa.field("shape", pa.string()),  # VARCHAR
+        pa.field("evolves_from_species", pa.string()),  # VARCHAR
+        pa.field("habitat", pa.string()),  # VARCHAR
+        pa.field("generation", pa.string()),  # VARCHAR
+        pa.field("varieties", pa.string()),  # VARCHAR
     ]
 )

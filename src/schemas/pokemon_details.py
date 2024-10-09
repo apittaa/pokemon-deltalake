@@ -1,7 +1,7 @@
 import pyarrow as pa
 
 # Define the schema using PyArrow fields
-POKEMON_DETAILS_SCHEMA = pa.schema(
+BRONZE_POKEMON_DETAILS_SCHEMA = pa.schema(
     [
         (
             "abilities",
@@ -225,5 +225,24 @@ POKEMON_DETAILS_SCHEMA = pa.schema(
             ),
         ),
         ("weight", pa.int64()),
+    ]
+)
+
+# Define the bronze schema using PyArrow
+SILVER_POKEMON_DETAILS_SCHEMA = pa.schema(
+    [
+        pa.field("id", pa.int64()),  # BIGINT
+        pa.field("name", pa.string()),  # VARCHAR
+        pa.field("base_experience", pa.int64()),  # BIGINT
+        pa.field("height", pa.int64()),  # BIGINT
+        pa.field("weight", pa.int64()),  # BIGINT
+        pa.field("abilities", pa.string()),  # VARCHAR
+        pa.field("hp_stat", pa.string()),  # VARCHAR
+        pa.field("attack_stat", pa.string()),  # VARCHAR
+        pa.field("defense_stat", pa.string()),  # VARCHAR
+        pa.field("special_attack_stat", pa.string()),  # VARCHAR
+        pa.field("special_defense_stat", pa.string()),  # VARCHAR
+        pa.field("speed_stat", pa.string()),  # VARCHAR
+        pa.field("types", pa.string()),  # VARCHAR
     ]
 )

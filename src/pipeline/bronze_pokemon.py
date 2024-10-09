@@ -11,9 +11,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from resources.duckdb_manager import create_duckdb_connection, execute_query
 from resources.s3_manager import create_s3_client
-from schemas.pokemon_details import POKEMON_DETAILS_SCHEMA
-from schemas.pokemon_species import POKEMON_SPICIES_SCHEMA
-from schemas.pokemons_list import POKEMONS_LIST_SCHEMA
+from schemas.pokemon_species import BRONZE_POKEMON_SPECIES_SCHEMA
+from schemas.pokemons_list import BRONZE_POKEMONS_LIST_SCHEMA
 
 
 def get_latest_file_from_s3(bucket: str, folder: str, s3_conn: boto3.client) -> str:
@@ -154,7 +153,11 @@ if __name__ == "__main__":
     ]
 
     # Schemas for each folder
-    schemas = [POKEMONS_LIST_SCHEMA, POKEMON_SPICIES_SCHEMA, POKEMON_DETAILS_SCHEMA]
+    schemas = [
+        BRONZE_POKEMONS_LIST_SCHEMA,
+        BRONZE_POKEMON_SPECIES_SCHEMA,
+        BRONZE_POKEMON_SPECIES_SCHEMA,
+    ]
 
     # Create S3 client
     s3_conn = create_s3_client(access_key, secret_key, s3_endpoint_url)

@@ -27,11 +27,57 @@ CREATE SECRET delta_s3 (
 -- Try accessing the Delta Lake table stored in MinIO
 SELECT * FROM delta_scan('s3://bronze/pokemons_bronze/pokemons_list/20241007_124140');
 
+-- Pokémon species queries
 SELECT * FROM delta_scan('s3://bronze/pokemons_bronze/pokemon_species/20241007_124140');
 
+DESCRIBE
+SELECT
+    id
+    , name
+    , capture_rate
+    , base_happiness
+    , is_baby
+    , is_legendary
+    , is_mythical
+    , growth_rate.name AS growth_rate
+    , array_to_string(json_extract_string(egg_groups, '$[*].name'), ', ') AS egg_groups
+    , color.name AS color
+    , shape.name AS shape
+    , evolves_from_species.name AS evolves_from_species
+    , habitat.name AS habitat
+    , generation.name AS generation
+    , array_to_string(json_extract_string(varieties, '$[*].pokemon.name'), ', ') AS varieties
+FROM delta_scan('s3://bronze/pokemons_bronze/pokemon_species/20241007_124140')
+ORDER BY id;
+
+
+-- Pokémon details queries
 SELECT * FROM delta_scan('s3://bronze/pokemons_bronze/pokemon_details/20241007_124140');
 
+DESCRIBE
+SELECT
+    id
+    , name
+    , base_experience
+    , height
+    , weight
+    , array_to_string(json_extract_string(abilities, '$[*].ability.name'), ', ') AS abilities
+    -- , json_array_length(json_extract(abilities, '$[*].ability.name')) AS ability_count
+    , json_extract_string(stats, '$[0].base_stat') AS hp_stat
+    , json_extract_string(stats, '$[1].base_stat') AS attack_stat
+    , json_extract_string(stats, '$[2].base_stat') AS defense_stat
+    , json_extract_string(stats, '$[3].base_stat') AS special_attack_stat
+    , json_extract_string(stats, '$[4].base_stat') AS special_defense_stat
+    , json_extract_string(stats, '$[5].base_stat') AS speed_stat
+    , array_to_string(json_extract_string(types, '$[*].type.name'), ', ') AS types
+    -- json_array_length(json_extract(types, '$[*].type.name')) AS type_count
+FROM delta_scan('s3://bronze/pokemons_bronze/pokemon_details/20241007_124140')
+ORDER BY id;
 
+
+SELECT * FROM delta_scan('s3://silver/pokemons_silver/pokemon_details/20241007_124140');
+
+SELECT * FROM delta_scan('s3://silver/pokemons_silver/pokemon_species/20241007_124140');
 
 SELECT * FROM read_json_auto('s3://raw/pokemons_raw/pokemons_list/20241007_124140.json');
 
