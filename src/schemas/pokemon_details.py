@@ -246,3 +246,35 @@ SILVER_POKEMON_DETAILS_SCHEMA = pa.schema(
         pa.field("types", pa.string()),  # VARCHAR
     ]
 )
+
+# Define the gold schema using PyArrow
+GOLD_POKEMON_DETAILS_SCHEMA = pa.schema(
+    [
+        pa.field("id", pa.int64()),  # BIGINT
+        pa.field("name", pa.string()),  # VARCHAR
+        pa.field("base_experience", pa.int64()),  # BIGINT
+        pa.field("height", pa.int64()),  # BIGINT
+        pa.field("weight", pa.int64()),  # BIGINT
+        pa.field("abilities", pa.string()),  # VARCHAR
+        pa.field("hp_stat", pa.string()),  # VARCHAR
+        pa.field("attack_stat", pa.string()),  # VARCHAR
+        pa.field("defense_stat", pa.string()),  # VARCHAR
+        pa.field("special_attack_stat", pa.string()),  # VARCHAR
+        pa.field("special_defense_stat", pa.string()),  # VARCHAR
+        pa.field("speed_stat", pa.string()),  # VARCHAR
+        pa.field("types", pa.string()),  # VARCHAR
+        pa.field("capture_rate", pa.int64()),  # BIGINT
+        pa.field("base_happiness", pa.int64()),  # BIGINT
+        pa.field("is_baby", pa.bool_()),  # BOOLEAN
+        pa.field("is_legendary", pa.bool_()),  # BOOLEAN
+        pa.field("is_mythical", pa.bool_()),  # BOOLEAN
+        pa.field("growth_rate", pa.string()),  # VARCHAR
+        pa.field("egg_groups", pa.string()),  # VARCHAR
+        pa.field("color", pa.string()),  # VARCHAR
+        pa.field("shape", pa.string()),  # VARCHAR
+        pa.field("evolves_from_species", pa.string()),  # VARCHAR
+        pa.field("habitat", pa.string()),  # VARCHAR
+        pa.field("generation", pa.string()),  # VARCHAR
+        pa.field("varieties", pa.string()),  # VARCHAR
+    ]
+)

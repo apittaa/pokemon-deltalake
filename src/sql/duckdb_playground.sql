@@ -74,6 +74,40 @@ SELECT
 FROM delta_scan('s3://bronze/pokemons_bronze/pokemon_details/20241007_124140')
 ORDER BY id;
 
+DESCRIBE
+SELECT
+    pd.id,
+    pd.name,
+    pd.base_experience,
+    pd.height,
+    pd.weight,
+    pd.abilities,
+    pd.hp_stat,
+    pd.attack_stat,
+    pd.defense_stat,
+    pd.special_attack_stat,
+    pd.special_defense_stat,
+    pd.speed_stat,
+    pd.types,
+    ps.capture_rate,
+    ps.base_happiness,
+    ps.is_baby,
+    ps.is_legendary,
+    ps.is_mythical,
+    ps.growth_rate,
+    ps.egg_groups,
+    ps.color,
+    ps.shape,
+    ps.evolves_from_species,
+    ps.habitat,
+    ps.generation,
+    ps.varieties
+FROM delta_scan('s3://silver/pokemons_silver/pokemon_details/20241007_124140') pd
+LEFT JOIN delta_scan('s3://silver/pokemons_silver/pokemon_species/20241007_124140') ps
+ON pd.id = ps.id
+ORDER BY pd.id;
+
+SELECT * FROM delta_scan('s3://gold/pokemons_gold/pokemon_details/20241007_124140');
 
 SELECT * FROM delta_scan('s3://silver/pokemons_silver/pokemon_details/20241007_124140');
 
