@@ -1,15 +1,18 @@
-import duckdb
-from loguru import logger
-from dotenv import load_dotenv
 import os
-import boto3
-
 import sys
+
+import boto3
+import duckdb
+from deltalake import write_deltalake
+from dotenv import load_dotenv
+from loguru import logger
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from resources.duckdb_manager import create_duckdb_connection, execute_query
 from resources.s3_manager import create_s3_client
+from schemas.pokemon_species import BRONZE_POKEMON_SPECIES_SCHEMA
+from schemas.pokemons_list import BRONZE_POKEMONS_LIST_SCHEMA
 
 
 def get_latest_file_from_s3(bucket: str, folder: str, s3_conn: boto3.client) -> str:
@@ -29,7 +32,7 @@ def get_latest_file_from_s3(bucket: str, folder: str, s3_conn: boto3.client) -> 
         str: The name of the latest file in the specified folder.
     """
 
-    logger.info("Getting the latest file from the S3 bucket")
+    logger.info(f"Getting the latest file from the S3 bucket folder: {folder}")
     response = s3_conn.list_objects_v2(Bucket=bucket, Prefix=folder)
 
     # Extract the filenames
@@ -41,11 +44,12 @@ def get_latest_file_from_s3(bucket: str, folder: str, s3_conn: boto3.client) -> 
     if files:
         # Return the latest file
         latest_file = os.path.basename(files[0])
-        logger.success(f"Latest file found: { latest_file}")
+        logger.success(f"Latest file found: {latest_file}")
 
         return latest_file
     else:
-        logger.error("No files found in the specified folder.")
+        logger.error(f"No files found in the specified folder: {folder}")
+        return None
 
 
 def get_and_save_data(
@@ -55,15 +59,24 @@ def get_and_save_data(
     raw_folder: str,
     bronze_folder: str,
     latest_raw_file: str,
+    access_key: str,
+    secret_key: str,
+    aws_region: str,
+    s3_endpoint_url: str,
+    schema: dict,
 ) -> None:
     """
-    Save data from a JSON file in an S3 bucket to a Parquet file in the same bucket.
+    Save data from a JSON file in an S3 bucket to a Delta Lake table in the same bucket.
     This function reads data from a JSON file stored in an S3 bucket using DuckDB,
-    and then writes the data to a Parquet file in the same bucket.
+    and then writes the data to a Delta Lake table in the same bucket.
     Args:
         conn (duckdb.DuckDBPyConnection): The DuckDB connection object.
-        bucket (str): The name of the S3 bucket.
-        latest_file (str): The name of the latest JSON file to be read and saved as Parquet.
+        raw_bucket (str): The name of the raw S3 bucket.
+        bronze_bucket (str): The name of the bronze S3 bucket.
+        raw_folder (str): The folder path within the raw S3 bucket.
+        bronze_folder (str): The folder path within the bronze S3 bucket.
+        latest_raw_file (str): The name of the latest JSON file to be read and saved as Delta Lake.
+        schema (dict): The schema to be used for the Delta Lake table.
     Returns:
         None
     """
@@ -71,26 +84,46 @@ def get_and_save_data(
     # Remove the file extension
     latest_raw_file = os.path.splitext(latest_raw_file)[0]
 
-    logger.info("Saving data to S3 bucket in Parquet format")
-    latest_raw_file_path = f"s3://{raw_bucket}/{raw_folder}/{latest_raw_file}"
-
+    latest_raw_file_path = f"s3://{raw_bucket}/{raw_folder}/{latest_raw_file}.json"
     latest_bronze_file_path = f"s3://{bronze_bucket}/{bronze_folder}/{latest_raw_file}"
 
     # Query to read the latest file
     query = f"""
-        COPY (
-            SELECT
-                *
-            FROM read_json_auto('{latest_raw_file_path}.json')
-        )
-        TO '{latest_bronze_file_path}.parquet'
-        (FORMAT PARQUET)
+        SELECT
+            *
+        FROM read_json_auto('{latest_raw_file_path}')
     """
     try:
-        execute_query(conn, query)
-        logger.success("Data saved to S3 bucket in Parquet format")
+        logger.info(
+            f"Saving data to S3 bucket in Delta Lake format for folder: {bronze_folder}"
+        )
+        # Execute the query and fetch the data
+        data = execute_query(conn, query).fetchdf()
+
+        # Set the S3 storage options
+        storage_options = {
+            "AWS_ACCESS_KEY_ID": access_key,
+            "AWS_SECRET_ACCESS_KEY": secret_key,
+            "AWS_ENDPOINT_URL": s3_endpoint_url,
+            "AWS_REGION": aws_region,
+            "AWS_S3_USE_HTTPS": "0",
+            "AWS_ALLOW_HTTP": "true",
+            "AWS_S3_ALLOW_UNSAFE_RENAME": "true",
+        }
+
+        # Write the data to Delta Lake format
+        write_deltalake(
+            latest_bronze_file_path,
+            data,
+            schema=schema,
+            storage_options=storage_options,
+            mode="overwrite",
+        )
+        logger.success(
+            f"Data saved to S3 bucket in Delta Lake format for folder: {bronze_folder}"
+        )
     except Exception as e:
-        logger.error(f"Error executing query: {e}")
+        logger.error(f"Error saving data to S3 bucket in Delta Lake format: {e}")
 
 
 if __name__ == "__main__":
@@ -107,25 +140,46 @@ if __name__ == "__main__":
     # Define the S3 endpoint URL
     s3_endpoint_url = "http://localhost:9000"
 
-    # Folder where the raw data is stored
-    raw_folder = "pokemons_raw/pokemons_list"
-    bronze_folder = "pokemons_bronze/pokemons_list"
+    # Folders where the raw data is stored
+    raw_folders = [
+        "pokemons_raw/pokemons_list",
+        "pokemons_raw/pokemon_species",
+        "pokemons_raw/pokemon_details",
+    ]
+    bronze_folders = [
+        "pokemons_bronze/pokemons_list",
+        "pokemons_bronze/pokemon_species",
+        "pokemons_bronze/pokemon_details",
+    ]
+
+    # Schemas for each folder
+    schemas = [
+        BRONZE_POKEMONS_LIST_SCHEMA,
+        BRONZE_POKEMON_SPECIES_SCHEMA,
+        BRONZE_POKEMON_SPECIES_SCHEMA,
+    ]
 
     # Create S3 client
     s3_conn = create_s3_client(access_key, secret_key, s3_endpoint_url)
 
-    # Get the latest file from the S3 bucket
-    latest_raw_file = get_latest_file_from_s3(raw_bucket, raw_folder, s3_conn)
-
     # Create DuckDB connection
     duckdb_conn = create_duckdb_connection(access_key, secret_key, aws_region)
 
-    # Save the data to the Bronze bucket
-    get_and_save_data(
-        duckdb_conn,
-        raw_bucket,
-        bronze_bucket,
-        raw_folder,
-        bronze_folder,
-        latest_raw_file,
-    )
+    for raw_folder, bronze_folder, schema in zip(raw_folders, bronze_folders, schemas):
+        # Get the latest file from the S3 bucket
+        latest_raw_file = get_latest_file_from_s3(raw_bucket, raw_folder, s3_conn)
+        if latest_raw_file:
+            # Save the data to the Bronze bucket
+            get_and_save_data(
+                duckdb_conn,
+                raw_bucket,
+                bronze_bucket,
+                raw_folder,
+                bronze_folder,
+                latest_raw_file,
+                access_key,
+                secret_key,
+                aws_region,
+                s3_endpoint_url,
+                schema,
+            )

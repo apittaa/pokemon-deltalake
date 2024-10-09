@@ -31,15 +31,18 @@ def create_duckdb_connection(
         logger.info("Installing and loading HTTPFS extension")
         conn.execute("INSTALL httpfs;")
         conn.execute("LOAD httpfs;")
-        logger.info("Setting S3 configuration parameters")
-        conn.execute("SET s3_url_style='path';")
-        conn.execute("SET s3_endpoint='localhost:9000';")
-        conn.execute("SET s3_use_ssl = false;")
-        conn.execute(f"SET s3_region='{aws_region}'")
-        conn.execute(f"SET s3_access_key_id='{aws_access_key}';")
-        conn.execute(f"SET s3_secret_access_key='{aws_secret_access_key}';")
-        logger.info("Loading AWS credentials")
-        conn.execute("CALL load_aws_credentials();")
+        logger.info("Creating and using S3 secret")
+        conn.execute(f"""
+            CREATE SECRET delta_s3 (
+                TYPE S3,
+                KEY_ID '{aws_access_key}',  -- Your AWS access key
+                SECRET '{aws_secret_access_key}',  -- Your AWS secret key
+                REGION '{aws_region}',  -- Your AWS region
+                ENDPOINT 'localhost:9000',  -- Your S3 endpoint
+                URL_STYLE 'path',  -- Use path-style access for S3
+                USE_SSL 'false'  -- Set to false for local S3 without SSL
+            );
+        """)
         logger.success("Connected to DuckDB")
         return conn
     except Exception as e:
@@ -47,13 +50,18 @@ def create_duckdb_connection(
         return None
 
 
-def execute_query(conn: duckdb.DuckDBPyConnection, query: str) -> None:
+def execute_query(
+    conn: duckdb.DuckDBPyConnection, query: str
+) -> duckdb.DuckDBPyRelation:
     """
-    Executes a given SQL query using the provided database connection.
+    Executes a given SQL query using the provided database connection and returns the result.
 
     Args:
         conn: A database connection object that has an execute method.
         query (str): The SQL query to be executed.
+
+    Returns:
+        duckdb.DuckDBPyRelation: The result of the query execution.
 
     Logs:
         Logs an info message before executing the query.
@@ -63,11 +71,13 @@ def execute_query(conn: duckdb.DuckDBPyConnection, query: str) -> None:
     Raises:
         Exception: If there is an error during query execution, it is caught and logged.
     """
-    
-    # Execute the query
+
+    # Execute the query and return the result
     try:
         logger.info("Executing query")
-        conn.execute(query)
+        result = conn.execute(query)
         logger.success("Query executed successfully")
+        return result
     except Exception as e:
         logger.error(f"Error executing query: {e}")
+        return None

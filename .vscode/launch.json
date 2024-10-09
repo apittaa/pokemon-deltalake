@@ -23,5 +23,16 @@
                 "PYTHONPATH": "${workspaceFolder}/.venv/lib/python3.12/site-packages"  // Add the workspace folder to the PYTHONPATH
             }
         },
+        {
+            "name": "silver_pokemon",  // Name of the configuration
+            "type": "debugpy",  // Type of debugger
+            "request": "launch",  // Request type
+            "console": "integratedTerminal",  // Use the integrated terminal for output
+            "program": "${workspaceFolder}/src/pipeline/silver_pokemon.py",  // Path to the program to debug
+            "justMyCode": true,  // Debug only user-written code
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/.venv/lib/python3.12/site-packages"  // Add the workspace folder to the PYTHONPATH
+            }
+        },
     ]
 }
