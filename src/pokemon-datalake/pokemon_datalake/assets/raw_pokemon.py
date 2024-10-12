@@ -150,7 +150,9 @@ def get_pokemons_details(get_pokemons_list: list) -> dict:
 
 
 @asset
-def save_data_to_s3(get_pokemons_details: dict, get_pokemons_list: list) -> None:
+def process_raw_pokemon_data(
+    get_pokemons_details: dict, get_pokemons_list: list
+) -> None:
     """
     Save Pokémon data to an S3 bucket.
     This function saves Pokémon details and list data to an S3 bucket. It retrieves
@@ -199,9 +201,11 @@ def save_data_to_s3(get_pokemons_details: dict, get_pokemons_list: list) -> None
 
 
 # Define the pipeline definitions
-defs = Definitions(assets=[get_pokemons_list, get_pokemons_details, save_data_to_s3])
+defs = Definitions(
+    assets=[get_pokemons_list, get_pokemons_details, process_raw_pokemon_data]
+)
 
 if __name__ == "__main__":
     pokemons_list = get_pokemons_list()
     pokemons_details = get_pokemons_details(pokemons_list)
-    save_data_to_s3(pokemons_details, pokemons_list)
+    process_raw_pokemon_data(pokemons_details, pokemons_list)

@@ -135,7 +135,7 @@ def save_data_to_delta_lake(
         logger.error(f"Error saving data to Delta Lake: {e}")
 
 
-@asset(deps=["save_data_to_s3"])
+@asset(deps=["process_raw_pokemon_data"])
 def process_bronze_pokemon_data() -> None:
     """
     Processes raw Pokémon data and saves it to a bronze data lake.
