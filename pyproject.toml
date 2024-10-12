@@ -6,7 +6,7 @@ authors = ["Pitta <arthurpitta21@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.13"
 loguru = "^0.7.2"
 requests = "^2.32.3"
 boto3 = "^1.35.29"
@@ -16,6 +16,8 @@ tqdm = "^4.66.5"
 ruff = "^0.6.8"
 deltalake = "^0.20.1"
 pandas = "^2.2.3"
+dagster = "^1.8.10"
+dagster-webserver = "^1.8.10"
 
 
 [build-system]

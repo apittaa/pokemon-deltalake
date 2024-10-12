@@ -13,7 +13,7 @@ SET s3_secret_access_key = 'iFy6Q8kRLJW58foza0kcCEXcQkiwo09u8dtaFZhuw4J';  -- Yo
 SET s3_region = 'us-east-1';  -- Your region
 
 -- Create a secret with your MinIO credentials
-CREATE SECRET delta_s3 (
+CREATE PERSISTENT SECRET delta_s3 (
     TYPE S3,
     KEY_ID 'V9FP0Kk0wCyBZ8xUQQkTJH',  -- Your MinIO access key
     SECRET 'iFy6Q8kRLJW58foza0kcCEXcQkiwo09u8dtaFZhuw4J',  -- Your MinIO secret key
@@ -25,7 +25,7 @@ CREATE SECRET delta_s3 (
 
 
 -- Try accessing the Delta Lake table stored in MinIO
-SELECT * FROM delta_scan('s3://bronze/pokemons_bronze/pokemons_list/20241007_124140');
+SELECT * FROM delta_scan('s3://bronze/pokemons_bronze/pokemons_list/20241011_202959');
 
 -- Pokémon species queries
 SELECT * FROM delta_scan('s3://bronze/pokemons_bronze/pokemon_species/20241007_124140');
@@ -106,6 +106,17 @@ FROM delta_scan('s3://silver/pokemons_silver/pokemon_details/20241007_124140') p
 LEFT JOIN delta_scan('s3://silver/pokemons_silver/pokemon_species/20241007_124140') ps
 ON pd.id = ps.id
 ORDER BY pd.id;
+
+
+CREATE OR REPLACE TABLE pokemons AS (
+    SELECT
+        *
+    FROM delta_scan('s3://gold/pokemons_gold/pokemon_details/20241011_202959')
+);
+
+SHOW tables;
+
+SELECT * FROM pokemons;
 
 SELECT * FROM delta_scan('s3://gold/pokemons_gold/pokemon_details/20241007_124140');
 
