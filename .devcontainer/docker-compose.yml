@@ -6,7 +6,7 @@ services:
       dockerfile: .devcontainer/Dockerfile  # Path to the Dockerfile
       target: dev # The target stage in the Dockerfile to build
     platform: linux/amd64  # Specifies the platform for the app service
-    container_name: devcontainer-apoenastack  # The container will be named 'devcontainer-apoenastack'
+    container_name: pokemon-datalake  # The container will be named 'pokemon-datalake'
 
     # Use host network
     network_mode: host  # This enables host networking
@@ -32,7 +32,7 @@ services:
       - '9001:9001'  # Maps port 9001 for Minio's console
     
     # Loads environment variables from an external file
-    env_file: ../.env  # Loads environment variables from a file
+    env_file: ./.env  # Loads environment variables from a file
     
     # Mounts a volume to persist Minio data
     volumes:
@@ -67,8 +67,52 @@ services:
       '
     
     # Loads environment variables from an external file
-    env_file: ../.env  # Loads environment variables from a file
+    env_file: ./.env  # Loads environment variables from a file
+
+  superset:
+    image: apache/superset:latest  # Official Superset image
+    container_name: superset
+    # Use host network
+    network_mode: host  # This enables host networking
+    ports:
+      - "8088:8088"  # Expose Superset on port 8088
+    environment:
+      SUPERSET_ENV: production  # Set the environment to production
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-default_secret_key}  # Secret key for Superset
+      SUPERSET_DATABASE_URI: postgresql://superset:superset@superset_db:5432/superset  # Link to Postgres for metadata
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+      POSTGRES_DB: superset
+      POSTGRES_HOST: superset-db           # MinIO endpoint
+    depends_on:
+      - superset_db  # Ensure the Postgres service starts first
+    volumes:
+      - superset_home:/app/superset_home  # Persist Superset data
+    command: >
+      sh -c "
+        pip install duckdb duckdb-engine sqlalchemy pyarrow && \
+        superset fab create-admin --username '$${SUPERSET_ADMIN_USERNAME}' --firstname Superset --lastname Admin --email admin@superset.com --password '$${SUPERSET_ADMIN_PASSWORD}' && \
+        superset db upgrade && \
+        superset init && \
+        superset run --host 0.0.0.0 -p 8088 --with-threads --reload
+      "
+    # Loads environment variables from an external file
+    env_file: ./.env  # Loads environment variables from a file
+
+  superset_db:
+    image: postgres:12
+    container_name: superset_db
+    # Use host network
+    network_mode: host  # This enables host networking
+    environment:
+      POSTGRES_DB: superset
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+    volumes:
+      - superset_db_data:/var/lib/postgresql/data  # Persist Postgres data
 
 # Declare the named volumes used by the services
 volumes:
   minio-data: {}  # Persistent storage for Minio data, managed by Docker
+  superset_home: {}  # New volume for Superset data
+  superset_db_data: {}  # New volume for Postgres data used by Superset
